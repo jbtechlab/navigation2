@@ -15,15 +15,15 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
-from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch_ros.actions import Node
-from launch_ros.actions import LoadComposableNodes
+from launch_ros.actions import LoadComposableNodes, Node
 from launch_ros.descriptions import ComposableNode
 from nav2_common.launch import RewrittenYaml
+
+from launch import LaunchDescription
+from launch.actions import (DeclareLaunchArgument, GroupAction,
+                            SetEnvironmentVariable)
+from launch.conditions import IfCondition
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
 
 def generate_launch_description():
@@ -130,6 +130,7 @@ def generate_launch_description():
                 name='bt_navigator',
                 output='screen',
                 parameters=[configured_params],
+                prefix=['xterm -e gdb -ex run --args'],
                 remappings=remappings),
             Node(
                 package='nav2_waypoint_follower',

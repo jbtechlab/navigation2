@@ -17,6 +17,11 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(nav2_util REQUIRED)
+find_package(lanelet2 REQUIRED)
+find_package(lanelet2_io REQUIRED)
+find_package(lanelet2_traffic_rules REQUIRED)
+find_package(lanelet2_projection REQUIRED)
+find_package(lanelet2_matching REQUIRED)
 
 nav2_package()
 
@@ -41,6 +46,11 @@ set(dependencies
   std_msgs
   std_srvs
   nav2_util
+  lanelet2
+  lanelet2_io
+  lanelet2_traffic_rules
+  lanelet2_projection
+  lanelet2_matching
 )
 
 add_library(${library_name} SHARED

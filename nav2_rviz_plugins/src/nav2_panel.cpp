@@ -724,6 +724,8 @@ Nav2Panel::startNavThroughPoses(std::vector<geometry_msgs::msg::PoseStamped> pos
   }
 
   nav_through_poses_goal_.poses = poses;
+  // nav_through_poses_goal_.planner_ids = "GridBased";
+
   RCLCPP_INFO(
     client_node_->get_logger(),
     "NavigateThroughPoses will be called using the BT Navigator's default behavior tree.");

@@ -16,6 +16,13 @@
 #include <string>
 #include <vector>
 
+#include <lanelet2_io/Io.h>
+#include <lanelet2_projection/UTM.h>
+#include <lanelet2_traffic_rules/TrafficRules.h>
+#include <lanelet2_traffic_rules/TrafficRulesFactory.h>
+
+#include "lanelet2_matching/LaneletMatching.h"
+
 #include "nav2_behavior_tree/plugins/action/compute_path_through_poses_action.hpp"
 
 namespace nav2_behavior_tree
@@ -31,8 +38,26 @@ ComputePathThroughPosesAction::ComputePathThroughPosesAction(
 
 void ComputePathThroughPosesAction::on_tick()
 {
-  getInput("goals", goal_.goals);
-  getInput("planner_id", goal_.planner_id);
+  std::vector<geometry_msgs::msg::PoseStamped> goals_temp;
+  auto exampleMapPath = "/overlay_ws/src/shadow/maps/lanelet2/map_v2.osm";
+  getInput("goals", goals_temp);
+  lanelet::LaneletMapPtr map = lanelet::load(exampleMapPath, lanelet::projection::UtmProjector(lanelet::Origin({0, 0})));
+
+  lanelet::matching::Object2d obj;
+  obj.pose.translation() = lanelet::BasicPoint2d(0.0000029,0.0000789);
+  // obj.pose.linear() = Eigen::Rotation2D<double>(150. / 180. * M_PI).matrix();
+    RCLCPP_INFO(
+      node_->get_logger(),
+      "Found matches %d", lanelet::matching::utils::findWithin(map->laneletLayer, obj, 0.1).size());
+  for (auto obj_map: lanelet::matching::utils::findWithin(map->laneletLayer, obj, 0.1))
+  {
+      RCLCPP_INFO(
+      node_->get_logger(),
+      "%d", obj_map);
+  }
+
+  getInput("planner_ids", goal_.planner_ids);
+  goal_.planner_ids = {"GridBased", "LolKek"};
   if (getInput("start", goal_.start)) {
     goal_.use_start = true;
   }

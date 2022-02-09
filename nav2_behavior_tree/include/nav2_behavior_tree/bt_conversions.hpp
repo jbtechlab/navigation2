@@ -111,6 +111,24 @@ inline std::chrono::milliseconds convertFromString<std::chrono::milliseconds>(co
   return std::chrono::milliseconds(std::stoul(key.data()));
 }
 
+/**
+ * @brief Parse XML string to geometry_msgs::msg::PoseStamped
+ * @param key XML string
+ * @return geometry_msgs::msg::PoseStamped
+ */
+template<>
+inline std::vector<std::string> convertFromString(const StringView key)
+{
+  // 7 real numbers separated by semicolons
+  auto parts = BT::splitString(key, ';');
+  std::vector<std::string> string_parts;
+  for (auto& part: parts){
+    string_parts.push_back({part.begin(), part.end()});
+  }
+
+  return string_parts;
+}
+
 }  // namespace BT
 
 #endif  // NAV2_BEHAVIOR_TREE__BT_CONVERSIONS_HPP_
