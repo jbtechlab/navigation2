@@ -405,7 +405,9 @@ PlannerServer::computePlanThroughPoses()
       if (!transformPosesToGlobalFrame(action_server_poses_, curr_start, curr_goal)) {
         return;
       }
-
+          RCLCPP_INFO(
+      node_->get_logger(),
+      "Found matches %d", lanelet::matching::getDeterministicMatches(*map, obj, 0.1).size());
       // Check if size 1 - use specified, if 0 then we use default that was assigned above, otherwise assign corresponding planner_id
       if(goal->planner_ids.size() == 1){
         current_planner_id = goal->planner_ids[0];

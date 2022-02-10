@@ -21,6 +21,9 @@
 #include "nav2_msgs/action/compute_path_through_poses.hpp"
 #include "nav_msgs/msg/path.h"
 #include "nav2_behavior_tree/bt_action_node.hpp"
+#include <tf2/exceptions.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/buffer.h>
 
 namespace nav2_behavior_tree
 {
@@ -71,6 +74,10 @@ public:
         BT::InputPort<std::vector<std::string>>("planner_ids", ""),
       });
   }
+
+private:
+  std::shared_ptr<tf2_ros::TransformListener> transform_listener_{nullptr};
+  std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 };
 
 }  // namespace nav2_behavior_tree
