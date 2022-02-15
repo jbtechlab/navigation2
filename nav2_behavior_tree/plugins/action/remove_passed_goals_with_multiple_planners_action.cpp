@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Samsung Research America
+// Copyright (c) 2022 JetBrains TechLab
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,13 +43,9 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
 {
   setStatus(BT::NodeStatus::RUNNING);
 
-  auto prev_planner_ids = planner_ids_;
+  prev_planner_ids_ = planner_ids_;
   getInput("input_planner_ids", planner_ids_);
 
-  // If input planners changed(e.g by another BT node), then we should populate remaining list of planners again.
-  if (prev_planner_ids != planner_ids_) {
-    remaining_planner_ids_ = planner_ids_;
-  }
   Goals goal_poses;
   getInput("input_goals", goal_poses);
 
@@ -57,24 +53,38 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
     setOutput("output_goals", goal_poses);
     return BT::NodeStatus::SUCCESS;
   }
+
+        RCLCPP_WARN(
+      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
+      "BEFORE %d", remaining_planner_ids_.size());
+  // If input planners changed(e.g by another BT node), or goals changed
+  // then we should populate remaining list of planners again.
+  if (prev_planner_ids_ != planner_ids_ || remaining_planner_ids_.size() == 0) {
+    remaining_planner_ids_ = planner_ids_;
+  }
+
+      RCLCPP_WARN(
+      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
+      "AFTER %d", remaining_planner_ids_.size());
   if (remaining_planner_ids_.size() != goal_poses.size() && planner_ids_.size() != 1 &&
     planner_ids_.size() != 0)
   {
-    RCLCPP_WARN(
-      config().blackboard->get<rclcpp::Node::SharedPtr>(
-        "node")->get_logger(),
-      "RemovePassedGoalsWithMultiplePlanners requested with a planner_ids array length mismatch. It should be either 0 - use default, \
-        1 - use one for all, or length should be equal to the number of goals. Current Planner Ids len %d, goal len %d",
-      planner_ids_.size(), goal_poses.size());
-    return BT::NodeStatus::FAILURE;
+
+    std::stringstream error_msg;
+    error_msg << "RemovePassedGoalsWithMultiplePlanners requested with a planner_ids array length mismatch."
+      "It should be either 0 - use default, "
+      "1 - use one for all, or length should be equal to the number of goals."
+      "Current Planner Ids len " << remaining_planner_ids_.size() << " " << remaining_planner_ids_[0] <<" goal len " << goal_poses.size();
+
+    throw std::runtime_error(error_msg.str());
   }
 
   using namespace nav2_util::geometry_utils;  // NOLINT
 
   geometry_msgs::msg::PoseStamped current_pose;
   if (!nav2_util::getCurrentPose(
-      current_pose, *tf_, global_frame_, robot_base_frame_,
-      transform_tolerance_))
+        current_pose, *tf_, global_frame_, robot_base_frame_,
+        transform_tolerance_))
   {
     return BT::NodeStatus::FAILURE;
   }
@@ -82,7 +92,7 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
   double dist_to_goal;
   while (goal_poses.size() > 1) {
     dist_to_goal = euclidean_distance(goal_poses[0].pose, current_pose.pose);
-
+    
     if (dist_to_goal > viapoint_achieved_radius_) {
       break;
     }
@@ -90,9 +100,25 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
     if (remaining_planner_ids_.size() > 0) {
       remaining_planner_ids_.erase(remaining_planner_ids_.begin());
     }
+
     goal_poses.erase(goal_poses.begin());
+          RCLCPP_WARN(
+      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
+      "R cycle %d", remaining_planner_ids_.size());
+            RCLCPP_WARN(
+      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
+      "goal cycle %d", goal_poses.size());
   }
 
+  
+
+
+     
+      RCLCPP_WARN(
+      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
+      "R %d", remaining_planner_ids_.size());
+
+    
   std::string planner_ids_str = "";
   for (auto i = 0; i < remaining_planner_ids_.size(); i++) {
     planner_ids_str += remaining_planner_ids_[i];

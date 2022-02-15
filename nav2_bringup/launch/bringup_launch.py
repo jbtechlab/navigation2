@@ -15,6 +15,8 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
+from launch_ros.actions import Node, PushRosNamespace
+from nav2_common.launch import RewrittenYaml
 
 from launch import LaunchDescription
 from launch.actions import (DeclareLaunchArgument, GroupAction,
@@ -22,9 +24,6 @@ from launch.actions import (DeclareLaunchArgument, GroupAction,
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch_ros.actions import PushRosNamespace
-from launch_ros.actions import Node
-from nav2_common.launch import RewrittenYaml
 
 
 def generate_launch_description():
@@ -99,7 +98,7 @@ def generate_launch_description():
         description='Automatically startup the nav2 stack')
 
     declare_use_composition_cmd = DeclareLaunchArgument(
-        'use_composition', default_value='True',
+        'use_composition', default_value='False',
         description='Whether to use composed bringup')
 
     # Specify the actions

@@ -359,7 +359,10 @@ PlannerServer::computePlanThroughPoses()
   {
     RCLCPP_WARN(
       get_logger(),
-      "Compute path through poses requested with a planner_ids array length mismatch. It should be either 0 - use default, 1 - use one for all, or length should be equal to the number of goals. Current Planner Ids len %d, goal len %d",
+      "Compute path through poses requested with a planner_ids array length mismatch."
+      "It should be either 0 - use default, 1 - use one for all, "
+      "or length should be equal to the number of goals. "
+      "Current Planner Ids len %d, goal len %d",
       goal->planner_ids.size(), goal->goals.size());
     action_server_poses_->terminate_current();
   }
@@ -402,7 +405,8 @@ PlannerServer::computePlanThroughPoses()
       if (!transformPosesToGlobalFrame(action_server_poses_, curr_start, curr_goal)) {
         return;
       }
-      // Check if size 1 - use specified, if 0 then we use default that was assigned above, otherwise assign corresponding planner_id
+      // Check if size 1 - use specified,
+      // if 0 then we use default that was assigned above, otherwise assign corresponding planner_id
       if (goal->planner_ids.size() == 1) {
         current_planner_id = goal->planner_ids[0];
       } else if (goal->planner_ids.size() != 0) {
