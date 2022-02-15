@@ -43,7 +43,9 @@ public:
       BT::InputPort<Goals>("input_goals", "Original goals to remove viapoints from"),
       BT::InputPort<std::string>("input_planner_ids", "Input set of planners"),
 
-      BT::OutputPort<std::string>("output_planner_ids", "Output set of planners. When remove goal from goal list, planner id will be removed too"),
+      BT::OutputPort<std::string>(
+        "output_planner_ids",
+        "Output set of planners. When remove goal from goal list, planner id will be removed too"),
       BT::OutputPort<Goals>("output_goals", "Goals with passed viapoints removed"),
       BT::InputPort<double>("radius", 0.5, "radius to goal for it to be considered for removal"),
       BT::InputPort<std::string>("global_frame", std::string("map"), "Global frame"),

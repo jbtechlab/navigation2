@@ -34,7 +34,6 @@ RemovePassedGoalsWithMultiplePlanners::RemovePassedGoalsWithMultiplePlanners(
 
   getInput("global_frame", global_frame_);
   getInput("robot_base_frame", robot_base_frame_);
-  
   tf_ = config().blackboard->get<std::shared_ptr<tf2_ros::Buffer>>("tf_buffer");
   auto node = config().blackboard->get<rclcpp::Node::SharedPtr>("node");
   node->get_parameter("transform_tolerance", transform_tolerance_);
@@ -48,11 +47,9 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
   getInput("input_planner_ids", planner_ids_);
 
   // If input planners changed(e.g by another BT node), then we should populate remaining list of planners again.
-  if (prev_planner_ids != planner_ids_){
+  if (prev_planner_ids != planner_ids_) {
     remaining_planner_ids_ = planner_ids_;
-  }  
-
-  
+  }
   Goals goal_poses;
   getInput("input_goals", goal_poses);
 
@@ -60,11 +57,15 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
     setOutput("output_goals", goal_poses);
     return BT::NodeStatus::SUCCESS;
   }
-  if (remaining_planner_ids_.size() != goal_poses.size() && planner_ids_.size()  != 1 && planner_ids_.size() != 0){
+  if (remaining_planner_ids_.size() != goal_poses.size() && planner_ids_.size() != 1 &&
+    planner_ids_.size() != 0)
+  {
     RCLCPP_WARN(
-      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
+      config().blackboard->get<rclcpp::Node::SharedPtr>(
+        "node")->get_logger(),
       "RemovePassedGoalsWithMultiplePlanners requested with a planner_ids array length mismatch. It should be either 0 - use default, \
-        1 - use one for all, or length should be equal to the number of goals. Current Planner Ids len %d, goal len %d", planner_ids_.size(), goal_poses.size());
+        1 - use one for all, or length should be equal to the number of goals. Current Planner Ids len %d, goal len %d",
+      planner_ids_.size(), goal_poses.size());
     return BT::NodeStatus::FAILURE;
   }
 
@@ -86,16 +87,16 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
       break;
     }
 
-    if (remaining_planner_ids_.size() > 0){
+    if (remaining_planner_ids_.size() > 0) {
       remaining_planner_ids_.erase(remaining_planner_ids_.begin());
     }
     goal_poses.erase(goal_poses.begin());
   }
 
   std::string planner_ids_str = "";
-  for (auto i=0; i < remaining_planner_ids_.size(); i++){
+  for (auto i = 0; i < remaining_planner_ids_.size(); i++) {
     planner_ids_str += remaining_planner_ids_[i];
-    if (i != remaining_planner_ids_.size()-1){
+    if (i != remaining_planner_ids_.size() - 1) {
       planner_ids_str += ";";
     }
   }
@@ -111,5 +112,6 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
 #include "behaviortree_cpp_v3/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
-  factory.registerNodeType<nav2_behavior_tree::RemovePassedGoalsWithMultiplePlanners>("RemovePassedGoalsWithMultiplePlanners");
+  factory.registerNodeType<nav2_behavior_tree::RemovePassedGoalsWithMultiplePlanners>(
+    "RemovePassedGoalsWithMultiplePlanners");
 }
