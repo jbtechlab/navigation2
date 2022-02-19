@@ -51,30 +51,26 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
 
   if (goal_poses.empty()) {
     setOutput("output_goals", goal_poses);
+    remaining_planner_ids_.clear();
     return BT::NodeStatus::SUCCESS;
   }
 
-        RCLCPP_WARN(
-      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
-      "BEFORE %d", remaining_planner_ids_.size());
   // If input planners changed(e.g by another BT node), or goals changed
   // then we should populate remaining list of planners again.
   if (prev_planner_ids_ != planner_ids_ || remaining_planner_ids_.size() == 0) {
     remaining_planner_ids_ = planner_ids_;
   }
 
-      RCLCPP_WARN(
-      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
-      "AFTER %d", remaining_planner_ids_.size());
   if (remaining_planner_ids_.size() != goal_poses.size() && planner_ids_.size() != 1 &&
     planner_ids_.size() != 0)
   {
-
     std::stringstream error_msg;
-    error_msg << "RemovePassedGoalsWithMultiplePlanners requested with a planner_ids array length mismatch."
+    error_msg <<
+      "RemovePassedGoalsWithMultiplePlanners requested with a planner_ids array length mismatch."
       "It should be either 0 - use default, "
       "1 - use one for all, or length should be equal to the number of goals."
-      "Current Planner Ids len " << remaining_planner_ids_.size() << " " << remaining_planner_ids_[0] <<" goal len " << goal_poses.size();
+      "Current Planner Ids len " << remaining_planner_ids_.size() << " "
+        << remaining_planner_ids_[0] <<" goal len " << goal_poses.size();
 
     throw std::runtime_error(error_msg.str());
   }
@@ -92,7 +88,6 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
   double dist_to_goal;
   while (goal_poses.size() > 1) {
     dist_to_goal = euclidean_distance(goal_poses[0].pose, current_pose.pose);
-    
     if (dist_to_goal > viapoint_achieved_radius_) {
       break;
     }
@@ -102,33 +97,10 @@ inline BT::NodeStatus RemovePassedGoalsWithMultiplePlanners::tick()
     }
 
     goal_poses.erase(goal_poses.begin());
-          RCLCPP_WARN(
-      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
-      "R cycle %d", remaining_planner_ids_.size());
-            RCLCPP_WARN(
-      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
-      "goal cycle %d", goal_poses.size());
-  }
-
-  
-
-
-     
-      RCLCPP_WARN(
-      config().blackboard->get<rclcpp::Node::SharedPtr>("node")->get_logger(),
-      "R %d", remaining_planner_ids_.size());
-
-    
-  std::string planner_ids_str = "";
-  for (auto i = 0; i < remaining_planner_ids_.size(); i++) {
-    planner_ids_str += remaining_planner_ids_[i];
-    if (i != remaining_planner_ids_.size() - 1) {
-      planner_ids_str += ";";
-    }
   }
 
   setOutput("output_goals", goal_poses);
-  setOutput("output_planner_ids", planner_ids_str);
+  setOutput("output_planner_ids", remaining_planner_ids_);
 
   return BT::NodeStatus::SUCCESS;
 }

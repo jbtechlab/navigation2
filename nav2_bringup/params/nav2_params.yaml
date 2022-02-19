@@ -306,6 +306,7 @@ planner_server:
         w_smooth: 0.3
         w_data: 0.2
         tolerance: 1e-10
+
 planner_server_rclcpp_node:
   ros__parameters:
     use_sim_time: True
