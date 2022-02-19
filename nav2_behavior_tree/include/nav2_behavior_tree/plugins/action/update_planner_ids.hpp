@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NAV2_BEHAVIOR_TREE__PLUGINS__ACTION__REMOVE_PASSED_GOALS_WITH_MULTIPLE_PLANNERS_ACTION_HPP_
-#define NAV2_BEHAVIOR_TREE__PLUGINS__ACTION__REMOVE_PASSED_GOALS_WITH_MULTIPLE_PLANNERS_ACTION_HPP_
+#ifndef NAV2_BEHAVIOR_TREE__PLUGINS__ACTION__REMOVE_PASSED_GOALS_ACTION_HPP_
+#define NAV2_BEHAVIOR_TREE__PLUGINS__ACTION__REMOVE_PASSED_GOALS_ACTION_HPP_
 
 #include <vector>
 #include <memory>
@@ -27,12 +27,12 @@
 namespace nav2_behavior_tree
 {
 
-class RemovePassedGoalsWithMultiplePlanners : public BT::ActionNodeBase
+class RemovePassedGoals : public BT::ActionNodeBase
 {
 public:
   typedef std::vector<geometry_msgs::msg::PoseStamped> Goals;
 
-  RemovePassedGoalsWithMultiplePlanners(
+  RemovePassedGoals(
     const std::string & xml_tag_name,
     const BT::NodeConfiguration & conf);
 
@@ -41,12 +41,7 @@ public:
   {
     return {
       BT::InputPort<Goals>("input_goals", "Original goals to remove viapoints from"),
-      BT::InputPort<std::vector<std::string>>("input_planner_ids", "Input set of planners"),
-
-      BT::OutputPort<std::vector<std::string>>(
-        "output_planner_ids",
-        "Output set of planners. When remove goal from goal list, planner id will be removed too"),
-      BT::OutputPort<Goals>("output_goals", "Goals with passed viapoints removed"),
+      BT::OutputPort<Goals>("input_planner_ids", "Original list of planner ids"),
       BT::InputPort<double>("radius", 0.5, "radius to goal for it to be considered for removal"),
       BT::InputPort<std::string>("global_frame", std::string("map"), "Global frame"),
       BT::InputPort<std::string>("robot_base_frame", std::string("base_link"), "Robot base frame"),
@@ -61,10 +56,8 @@ private:
   std::string robot_base_frame_, global_frame_;
   double transform_tolerance_;
   std::shared_ptr<tf2_ros::Buffer> tf_;
-  std::vector<std::string> planner_ids_, prev_planner_ids_;
-  std::vector<std::string> remaining_planner_ids_;
 };
 
 }  // namespace nav2_behavior_tree
 
-#endif  // NAV2_BEHAVIOR_TREE__PLUGINS__ACTION__REMOVE_PASSED_GOALS_WITH_MULTIPLE_PLANNERS_ACTION_HPP_
+#endif  // NAV2_BEHAVIOR_TREE__PLUGINS__ACTION__REMOVE_PASSED_GOALS_ACTION_HPP_

@@ -1,7 +1,9 @@
 
 <!--
   This Behavior Tree replans the global path periodically at 1 Hz through an array of poses continuously
-   and it also has recovery actions specific to planning / control as well as general system issues.
+  with selecting the provided planner ids. In here example there 2 planner ids hence array of poses should consist
+  of 2. It serves as an example of using multiple planner id in viapoint mode.
+  and it also has recovery actions specific to planning / control as well as general system issues.
 -->
 <root main_tree_to_execute="MainTree">
   <BehaviorTree ID="MainTree">
